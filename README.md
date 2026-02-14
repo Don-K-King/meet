@@ -50,7 +50,7 @@ This repository includes a production-like Docker Compose setup for running Meet
 
 - `Dockerfile`: Multi-stage production build (`node:20-alpine`) for the Next.js app.
 - `docker-compose.yml`: Runs `meet` and `caddy` services on an isolated bridge network. The `meet` service starts explicitly with `next start -p 3000`.
-- `Caddyfile`: Reverse proxy configuration from HTTPS to `meet:3000`.
+- `Caddyfile`: Reverse proxy configuration for `https://meet.local` -> `meet:3000` and `https://livekit.local` -> `host.docker.internal:7880`.
 - `.env.example`: Environment variable template (without secrets).
 
 ### Start
@@ -59,22 +59,25 @@ This repository includes a production-like Docker Compose setup for running Meet
    ```bash
    cp .env.example .env
    ```
-2. Edit `.env` and set values for your environment (`CADDY_HOST`, `NEXT_PUBLIC_LIVEKIT_URL`, `LIVEKIT_URL`, and optional API credentials).
+2. Edit `.env` and set values for your environment (`NEXT_PUBLIC_LIVEKIT_URL`, `LIVEKIT_URL`, and optional API credentials).
 3. Build and start the stack:
    ```bash
    docker compose up -d --build
    ```
-4. Open `https://<HOST>` (for local host testing with the default Caddyfile, use `https://localhost`).
+4. Open `https://meet.local:8445` for the Meet UI.
+5. Point your LiveKit URLs to `wss://livekit.local:8445` when testing through the same Caddy entrypoint.
 
 ### Caddy TLS mode
 
-- **LAN / lab mode (default):** `tls internal` issues an internal CA certificate.
-- **Public domain mode:** set `CADDY_HOST` to your domain and remove `tls internal` from `Caddyfile`. Caddy will then request Let's Encrypt certificates automatically.
+- **LAN / lab mode (default):** `tls internal` issues an internal CA certificate for `meet.local` and `livekit.local`.
+- **Linux host access:** `docker-compose.yml` maps `host.docker.internal` to `host-gateway` for the Caddy container so `livekit.local` can reach LiveKit on the host.
+- **Public domain mode:** replace the hostnames in `Caddyfile` with your real domains and remove `tls internal`. Caddy will then request Let's Encrypt certificates automatically.
 
 ### LiveKit connectivity
 
 - Compose does **not** start a LiveKit server.
-- Configure `NEXT_PUBLIC_LIVEKIT_URL` and `LIVEKIT_URL` to an external LiveKit endpoint (`ws://livekit:7880`, `wss://your-livekit-domain`, or an external IP/hostname).
+- Configure `NEXT_PUBLIC_LIVEKIT_URL` and `LIVEKIT_URL` to match your deployment (for this Caddy setup: `wss://livekit.local:8445`).
+- If `host.docker.internal` is unavailable in your Docker setup, replace it in `Caddyfile` with a reachable host IP (for example `172.17.0.1` on many Linux systems).
 
 ### Security notes
 

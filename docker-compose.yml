@@ -17,11 +17,11 @@ services:
     restart: unless-stopped
     depends_on:
       - meet
-    environment:
-      - CADDY_HOST=${CADDY_HOST:-localhost}
     ports:
       - "8085:80"
       - "8445:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
