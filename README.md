@@ -31,6 +31,13 @@ LiveKit Meet is an open source video conferencing app built on [LiveKit Componen
 
 Give it a try at https://meet.livekit.io.
 
+## Default lobby redirect
+
+- The root route (`/`) redirects directly to `/rooms/<roomName>`.
+- By default `<roomName>` is `lobby`.
+- You can override it with `NEXT_PUBLIC_DEFAULT_ROOM` (for example `team-standup`).
+- The custom token join flow remains available at `/custom`.
+
 ## Dev Setup
 
 Steps to get a local dev setup up and running:
