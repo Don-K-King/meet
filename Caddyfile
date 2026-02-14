@@ -1,7 +1,11 @@
-# Set CADDY_HOST to your LAN hostname or public domain.
-# For LAN-only operation keep `tls internal`.
-# For public domains, remove `tls internal` to let Caddy request Let's Encrypt certificates automatically.
-{$CADDY_HOST:localhost} {
+# Meet UI endpoint
+meet.local {
   reverse_proxy meet:3000
+  tls internal
+}
+
+# LiveKit endpoint (forwarded to host)
+livekit.local {
+  reverse_proxy host.docker.internal:7880
   tls internal
 }
