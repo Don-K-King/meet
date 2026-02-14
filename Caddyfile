@@ -1,0 +1,7 @@
+# Set CADDY_HOST to your LAN hostname or public domain.
+# For LAN-only operation keep `tls internal`.
+# For public domains, remove `tls internal` to let Caddy request Let's Encrypt certificates automatically.
+{$CADDY_HOST:localhost} {
+  reverse_proxy meet:3000
+  tls internal
+}

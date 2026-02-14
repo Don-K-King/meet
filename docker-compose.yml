@@ -1,0 +1,37 @@
+services:
+  meet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - "3000"
+    networks:
+      - meet-net
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      - meet
+    environment:
+      - CADDY_HOST=${CADDY_HOST:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - meet-net
+
+networks:
+  meet-net:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
