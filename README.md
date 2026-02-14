@@ -40,3 +40,44 @@ Steps to get a local dev setup up and running:
 3. Update the missing environment variables in the newly created `.env.local` file.
 4. Run `pnpm dev` to start the development server and visit [http://localhost:3000](http://localhost:3000) to see the result.
 5. Start development 🎉
+
+
+## Production-like Docker deployment
+
+This repository includes a production-like Docker Compose setup for running Meet behind a Caddy reverse proxy.
+
+### Files
+
+- `Dockerfile`: Multi-stage production build (`node:20-alpine`) for the Next.js app.
+- `docker-compose.yml`: Runs `meet` and `caddy` services on an isolated bridge network.
+- `Caddyfile`: Reverse proxy configuration from HTTPS to `meet:3000`.
+- `.env.example`: Environment variable template (without secrets).
+
+### Start
+
+1. Create your runtime environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Edit `.env` and set values for your environment (`CADDY_HOST`, `NEXT_PUBLIC_LIVEKIT_URL`, `LIVEKIT_URL`, and optional API credentials).
+3. Build and start the stack:
+   ```bash
+   docker compose up -d --build
+   ```
+4. Open `https://<HOST>` (for local host testing with the default Caddyfile, use `https://localhost`).
+
+### Caddy TLS mode
+
+- **LAN / lab mode (default):** `tls internal` issues an internal CA certificate.
+- **Public domain mode:** set `CADDY_HOST` to your domain and remove `tls internal` from `Caddyfile`. Caddy will then request Let's Encrypt certificates automatically.
+
+### LiveKit connectivity
+
+- Compose does **not** start a LiveKit server.
+- Configure `NEXT_PUBLIC_LIVEKIT_URL` and `LIVEKIT_URL` to an external LiveKit endpoint (`ws://livekit:7880`, `wss://your-livekit-domain`, or an external IP/hostname).
+
+### Security notes
+
+- Do not commit `.env` files with real credentials.
+- Use external secret management for production where possible.
+- Keep `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` empty unless server-side token minting is required.
