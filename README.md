@@ -49,7 +49,7 @@ This repository includes a production-like Docker Compose setup for running Meet
 ### Files
 
 - `Dockerfile`: Multi-stage production build (`node:20-alpine`) for the Next.js app.
-- `docker-compose.yml`: Runs `meet` and `caddy` services on an isolated bridge network.
+- `docker-compose.yml`: Runs `meet` and `caddy` services on an isolated bridge network. The `meet` service starts explicitly with `next start -p 3000`.
 - `Caddyfile`: Reverse proxy configuration from HTTPS to `meet:3000`.
 - `.env.example`: Environment variable template (without secrets).
 
